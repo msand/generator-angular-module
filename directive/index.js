@@ -28,7 +28,7 @@ util.inherits(DirectiveGenerator, yeoman.generators.NamedBase);
 DirectiveGenerator.prototype.askFor = function askFor() {
 if(this.moduleType =='directive') {
 	var cb = this.async();
-	
+
 	var prompts = [
 		// {
 			// name: 'directivePrompt',
@@ -36,10 +36,10 @@ if(this.moduleType =='directive') {
 			// default: 'test-directive'		//TESTING
 		// }
 	];
-	
+
 	this.prompt(prompts, function (props) {
 		// this.directivePrompt =props.directivePrompt;
-		
+
 		cb();
 	}.bind(this));
 }
@@ -52,7 +52,7 @@ if(this.moduleType =='directive') {
 
 	this.copy('master/_.gitignore', '.gitignore');
 	this.copy('master/CHANGELOG.md', 'CHANGELOG.md');
-	
+
 	// this.copy('master/editorconfig', '.editorconfig');
 	// this.copy('master/jshintrc', '.jshintrc');
 }
@@ -62,16 +62,16 @@ DirectiveGenerator.prototype.commandsMaster = function commandsMaster() {
 if(this.moduleType =='directive') {
 	var cb = this.async();
 	var self =this;
-	
+
 	//init git stuff (master and gh-pages branches)
 	var commands =[
 		//init master branch
 		"git init .",
 		"git add -A",
 		"git commit -am 'init'",
-		"git remote add origin git@github.com:"+this.githubName+"/"+this.moduleName+".git",
+		"git remote add origin "+this.gitUrl,
 		// "git push origin master",		//this requires credentials so skip it
-		
+
 		//checkout / switch to gh-pages branch - have to do this BEFORE create the new files in it
 		"git checkout --orphan gh-pages",
 		"git rm -rf ."
@@ -91,20 +91,20 @@ if(this.moduleType =='directive') {
 	this.mkdir('pages/home');
 
 	this.copy('gh-pages/_.gitignore', '.gitignore');
-	
+
 	this.template('gh-pages/_base.less', '_base.less');
 	this.template('gh-pages/_bower.json', 'bower.json');
 	this.template('gh-pages/_app.js', 'app.js');
 	this.template('gh-pages/_Gruntfile.js', 'Gruntfile.js');
 	this.template('gh-pages/_index.html', 'index.html');
 	this.template('gh-pages/_package.json', 'package.json');
-	
+
 	this.template('gh-pages/_directive.js', this.moduleNamePart+'.js');
 	this.template('gh-pages/_directive.less', this.moduleNamePart+'.less');
 	this.template('gh-pages/__directive.less', '_'+this.moduleNamePart+'.less');
-	
+
 	this.copy('gh-pages/server.js', 'server.js');
-	
+
 	this.copy('gh-pages/pages/home/home.html', 'pages/home/home.html');
 	this.copy('gh-pages/pages/home/HomeCtrl.js', 'pages/home/HomeCtrl.js');
 }
@@ -114,13 +114,13 @@ DirectiveGenerator.prototype.commandsGHPages = function commandsGHPages() {
 if(this.moduleType =='directive') {
 	var cb = this.async();
 	var self =this;
-	
+
 	var commands =[
 		//git
 		"git add -A",
 		// "git commit -am 'init gh-pages'"		//doesn't work - it thinks the 'gh-pages' is a 'pathspec'??
 		"git commit -am 'init'"
-		
+
 		//npm and bower install (not really necessary but nice)		//UPDATE - takes a long time and sometimes errors
 		// "npm install",
 		// "bower install"

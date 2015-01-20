@@ -15,7 +15,7 @@ var ServiceGenerator = module.exports = function ServiceGenerator(args, options,
 	yeoman.generators.NamedBase.apply(this, arguments);
 
 	// console.log('You called the service subgenerator with the argument ' + this.name + '.');
-	
+
 	//copy over prompt options to 'this' scope for templating
 	var xx;
 	for(xx in this.options.props) {
@@ -28,7 +28,7 @@ util.inherits(ServiceGenerator, yeoman.generators.NamedBase);
 ServiceGenerator.prototype.askFor = function askFor() {
 if(this.moduleType =='service') {
 	var cb = this.async();
-	
+
 	var prompts = [
 		// {
 			// name: 'servicePrompt',
@@ -36,10 +36,10 @@ if(this.moduleType =='service') {
 			// default: 'test-service'		//TESTING
 		// }
 	];
-	
+
 	this.prompt(prompts, function (props) {
 		// this.servicePrompt =props.servicePrompt;
-		
+
 		cb();
 	}.bind(this));
 }
@@ -52,7 +52,7 @@ if(this.moduleType =='service') {
 
 	this.copy('master/_.gitignore', '.gitignore');
 	this.copy('master/CHANGELOG.md', 'CHANGELOG.md');
-	
+
 	// this.copy('master/editorconfig', '.editorconfig');
 	// this.copy('master/jshintrc', '.jshintrc');
 }
@@ -62,16 +62,16 @@ ServiceGenerator.prototype.commandsMaster = function commandsMaster() {
 if(this.moduleType =='service') {
 	var cb = this.async();
 	var self =this;
-	
+
 	//init git stuff (master and gh-pages branches)
 	var commands =[
 		//init master branch
 		"git init .",
 		"git add -A",
 		"git commit -am 'init'",
-		"git remote add origin git@github.com:"+this.githubName+"/"+this.moduleName+".git",
+		"git remote add origin "+this.gitUrl,
 		// "git push origin master",		//this requires credentials so skip it
-		
+
 		//checkout / switch to gh-pages branch - have to do this BEFORE create the new files in it
 		"git checkout --orphan gh-pages",
 		"git rm -rf ."
@@ -91,19 +91,19 @@ if(this.moduleType =='service') {
 	this.mkdir('pages/home');
 
 	this.copy('gh-pages/_.gitignore', '.gitignore');
-	
+
 	this.template('gh-pages/_bower.json', 'bower.json');
 	this.template('gh-pages/_app.js', 'app.js');
 	this.template('gh-pages/_Gruntfile.js', 'Gruntfile.js');
 	this.template('gh-pages/_index.html', 'index.html');
 	this.template('gh-pages/_package.json', 'package.json');
-	
+
 	this.template('gh-pages/_service.js', this.moduleNamePart+'.js');
-	
+
 	this.copy('gh-pages/server.js', 'server.js');
-	
+
 	this.template('gh-pages/pages/home/HomeCtrl.js', 'pages/home/HomeCtrl.js');
-	
+
 	this.copy('gh-pages/pages/home/home.html', 'pages/home/home.html');
 }
 };
@@ -112,13 +112,13 @@ ServiceGenerator.prototype.commandsGHPages = function commandsGHPages() {
 if(this.moduleType =='service') {
 	var cb = this.async();
 	var self =this;
-	
+
 	var commands =[
 		//git
 		"git add -A",
 		// "git commit -am 'init gh-pages'"		//doesn't work - it thinks the 'gh-pages' is a 'pathspec'??
 		"git commit -am 'init'"
-		
+
 		//npm and bower install (not really necessary but nice)		//UPDATE - takes a long time and sometimes errors
 		// "npm install",
 		// "bower install"

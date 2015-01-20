@@ -43,6 +43,10 @@ AngularModuleGenerator.prototype.askFor = function askFor() {
 			message: 'Module name (i.e. angular-forminput)',
 			default: 'angular-module-test'		//TESTING
 		},
+        {
+            name: 'gitUrl',
+            message: 'Git url (i.e. git@github.com:githubName/moduleName.git / git@bitbucket.org:bitbucketName/moduleName.git)'
+        },
 		{
 			name: 'githubName',
 			message: 'Github User or Organization Name',
@@ -72,15 +76,16 @@ AngularModuleGenerator.prototype.askFor = function askFor() {
 
 	this.prompt(prompts, function (props) {
 		this.moduleType = props.moduleType;
-		
+
 		this.moduleName = props.moduleName;
-		
+
 		//pull out the angular prefix to get just the module name
 		var prefix ='angular-';
 		this.moduleNamePart =props.moduleName.slice(props.moduleName.indexOf(prefix)+prefix.length, props.moduleName.length);
 		// console.log(this.moduleNamePart);
-		
+
 		this.modulePrefix = props.modulePrefix;
+        this.gitUrl = props.gitUrl;
 		this.githubName = props.githubName;
 		this.authorName = props.authorName;
 		this.moduleDescription = props.moduleDescription;
@@ -93,9 +98,9 @@ AngularModuleGenerator.prototype.askFor = function askFor() {
 AngularModuleGenerator.prototype.app = function app() {
 	var self =this;
 	_self =this;
-	
+
 	var cb = this.async();
-	
+
 	if(this.moduleType =='directive') {
 		/*
 		self._directiveFiles()
@@ -136,23 +141,23 @@ AngularModuleGenerator.prototype.app = function app() {
 //directive
 AngularModuleGenerator.prototype._directiveFiles =function files(callback) {
 	var self =_self;
-	
+
 	// var deferred =Q.defer();
-	
+
 	self.log.writeln('directiveFiles start');
-	
+
 	// this.copy('_package.json', 'package.json');
 	self.template('_bower.json', 'bower.json');
 	self.template('_README.md', 'README.md');
 
 	self.copy('.gitignore', '.gitignore');
 	self.copy('CHANGELOG.md', 'CHANGELOG.md');
-	
+
 	self.template('gh-pages/_base.less', '_base.less');		//TESTING
-	
+
 	// this.copy('editorconfig', '.editorconfig');
 	// this.copy('jshintrc', '.jshintrc');
-	
+
 	self.log.writeln('directiveFiles end');
 	// deferred.resolve({});
 	// return deferred.promise;
@@ -162,11 +167,11 @@ AngularModuleGenerator.prototype._directiveFiles =function files(callback) {
 AngularModuleGenerator.prototype._directiveCommandsMaster =function commandsMaster(callback) {
 	var self =this;
 	var self =_self;
-	
+
 	// var cb = this.async();
 	// var deferred =Q.defer();
 	self.log.writeln('directiveCommandsMaster start');
-	
+
 	//init git stuff (master and gh-pages branches)
 	var commands =[
 		//init master branch
@@ -175,7 +180,7 @@ AngularModuleGenerator.prototype._directiveCommandsMaster =function commandsMast
 		"git commit -am 'init'",
 		"git remote add origin git@github.com:"+self.githubName+"/"+self.moduleName+".git",
 		// "git push origin master",		//this requires credentials so skip it
-		
+
 		//checkout / switch to gh-pages branch - have to do this BEFORE create the new files in it
 		"git checkout --orphan gh-pages",
 		"git rm -rf ."
@@ -189,37 +194,37 @@ AngularModuleGenerator.prototype._directiveCommandsMaster =function commandsMast
 		// deferred.resolve({});
 		callback(false);
 	});
-	
+
 	// return deferred.promise;
 };
 
 AngularModuleGenerator.prototype._directiveFilesGHPages = function filesGHPages(callback) {
 	var self =_self;
-	
+
 	// var deferred =Q.defer();
-	
+
 	self.log.writeln('directiveFilesGHPages start');
-	
+
 	self.mkdir('pages');
 	self.mkdir('pages/home');
 
 	// self.copy('gh-pages/.gitignore', '.gitignore');
-	
+
 	self.template('gh-pages/_base.less', '_base.less');
 	self.template('gh-pages/_bower.json', 'bower.json');
 	self.template('gh-pages/_app.js', 'app.js');
 	self.template('gh-pages/_Gruntfile.js', 'Gruntfile.js');
 	self.template('gh-pages/_index.html', 'index.html');
 	self.template('gh-pages/_package.json', 'package.json');
-	
+
 	self.template('gh-pages/_directive.js', self.moduleNamePart+'.js');
 	self.template('gh-pages/_directive.less', self.moduleNamePart+'.less');
-	
+
 	self.copy('gh-pages/pages/home/home.html', 'pages/home/home.html');
 	self.copy('gh-pages/pages/home/HomeCtrl.js', 'pages/home/HomeCtrl.js');
-	
+
 	self.log.writeln('directiveFilesGHPages end');
-	
+
 	// deferred.resolve({});
 	// return deferred.promise;
 	callback(false);
@@ -228,18 +233,18 @@ AngularModuleGenerator.prototype._directiveFilesGHPages = function filesGHPages(
 AngularModuleGenerator.prototype._directiveCommandsGHPages =function commandsGHPages(callback) {
 	var self =this;
 	var self =_self;
-	
+
 	// var cb = this.async();
 	// var deferred =Q.defer();
-	
+
 	self.log.writeln('directiveCommandsGHPages start');
-	
+
 	var commands =[
 		//git
 		"git add -A",
 		// "git commit -am 'init gh-pages'"		//doesn't work - it thinks the 'gh-pages' is a 'pathspec'??
 		"git commit -am 'init'"
-		
+
 		//npm and bower install (not really necessary but nice)		//UPDATE - takes a long time and sometimes errors
 		// "npm install",
 		// "bower install"
@@ -248,13 +253,13 @@ AngularModuleGenerator.prototype._directiveCommandsGHPages =function commandsGHP
 	exec(command, {}, function(err, stdout, stderr) {
 		self.log.writeln("command run and done: "+command);
 		self.log.writeln('stdout: '+stdout+' stderr: '+stderr);
-		
+
 		self.log.writeln('directiveCommandsGHPages end');
-		
+
 		// cb();
 		// deferred.resolve({});
 		callback(false);
 	});
-	
+
 	// return deferred.promise;
 };

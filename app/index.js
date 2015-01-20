@@ -14,7 +14,7 @@ var yeoman = require('yeoman-generator');
 
 var AngularModuleGenerator = module.exports = function AngularModuleGenerator(args, options, config) {
 	yeoman.generators.Base.apply(this, arguments);
-	
+
 	// console.log('this: '+JSON.stringify(this));
 	//call directive sub-generator
 	// if(this.options.props.moduleType =='directive') {		//apparently don't have access to options yet AND can only call hookFor from outer level here in constructor so there's no way to conditionally call a hookFor based on the prompts?! wtf?
@@ -26,7 +26,7 @@ var AngularModuleGenerator = module.exports = function AngularModuleGenerator(ar
 			}
 		});
 	}
-	
+
 	//call service sub-generator
 	this.hookFor('angular-module:service', {
 		args: ['name'],		//apparently this is required - get an error if don't have it - even though I don't use or need it..
@@ -37,7 +37,7 @@ var AngularModuleGenerator = module.exports = function AngularModuleGenerator(ar
 
   this.on('end', function () {
     // this.installDependencies({ skipInstall: options['skip-install'] });
-	
+
 	this.log.writeln('Next steps:\n1. run `npm install && bower install`\n2. write your code then run `grunt`\n3. create github repo\n4. commit & push `gh-pages` branch\n5. commit, tag, & push `master` branch\n6. (optional) register bower component');
   });
 
@@ -67,6 +67,11 @@ AngularModuleGenerator.prototype.askFor = function askFor() {
 			name: 'moduleName',
 			message: 'Module name (i.e. angular-forminput)'
 		},
+        {
+            name: 'gitUrl',
+            message: 'Git url (i.e. git@github.com:githubName/moduleName.git / git@bitbucket.org:bitbucketName/moduleName.git)'
+            // default: 'jackrabbitsgroup'
+        },
 		{
 			name: 'githubName',
 			message: 'Github User or Organization Name'
@@ -97,16 +102,17 @@ AngularModuleGenerator.prototype.askFor = function askFor() {
 	this.prompt(prompts, function (props) {
 		this.options.props ={};
 		this.options.props.moduleType =this.moduleType = props.moduleType;
-		
+
 		this.options.props.moduleName =this.moduleName = props.moduleName;
-		
+
 		//pull out the angular prefix to get just the module name
 		var prefix ='angular-';
 		this.options.props.moduleNamePart =this.moduleNamePart =props.moduleName.slice(props.moduleName.indexOf(prefix)+prefix.length, props.moduleName.length);
 		// console.log(this.moduleNamePart);
-		
+
 		this.options.props.modulePrefix =this.modulePrefix = props.modulePrefix;
-		this.options.props.githubName =this.githubName = props.githubName;
+        this.options.props.gitUrl =this.gitUrl = props.gitUrl;
+        this.options.props.githubName =this.githubName = props.githubName;
 		this.options.props.authorName =this.authorName = props.authorName;
 		this.options.props.moduleDescription =this.moduleDescription = props.moduleDescription;
 		this.options.props.moduleKeywords =this.moduleKeywords = props.moduleKeywords.split(' ');
